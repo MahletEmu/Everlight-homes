@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+@layer base {
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, Cambria, 'Times New Roman', serif;
+    --font-script: 'Alex Brush', cursive, 'Brush Script MT', sans-serif;
+  }
+}
+
+.font-script {
+  font-family: var(--font-script), cursive, "Brush Script MT", sans-serif;
+}
+
+.font-serif-luxury {
+  font-family: var(--font-serif), Georgia, Cambria, "Times New Roman", serif;
+}
+
+/* Glassmorphism & subtle luxury shadows */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.glass-dark {
+  background: rgba(10, 20, 38, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-luxury {
+  background: #ffffff;
+  border: 1px solid #EAE6DF;
+  box-shadow: 0 4px 20px -2px rgba(10, 20, 38, 0.05), 0 2px 6px -1px rgba(10, 20, 38, 0.02);
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-luxury:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 32px -4px rgba(10, 20, 38, 0.1), 0 4px 12px -2px rgba(10, 20, 38, 0.04);
+  border-color: #D6CEBE;
+}
+
+/* Gold button hover glow */
+.btn-gold {
+  background: linear-gradient(135deg, #DFB967 0%, #C59B38 100%);
+  color: #0A1426;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-gold:hover {
+  background: linear-gradient(135deg, #E5C375 0%, #B88E2D 100%);
+  box-shadow: 0 4px 14px 0 rgba(197, 155, 56, 0.35);
+}
+
+.btn-navy {
+  background-color: #0A1426;
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.btn-navy:hover {
+  background-color: #132446;
+  box-shadow: 0 4px 14px 0 rgba(10, 20, 38, 0.25);
+}
