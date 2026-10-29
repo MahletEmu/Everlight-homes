@@ -73,13 +73,21 @@ export default function PropertyCard({ property }: Props) {
             <div className="flex items-center gap-1.5">
               <Bed className="w-4 h-4 text-[#C59B38]" />
               <span>
-                {property.bedrooms} {isAmharic ? "መኝታ" : "Beds"}
+                {property.bedrooms > 0
+                  ? `${property.bedrooms} ${isAmharic ? "መኝታ" : "Beds"}`
+                  : isAmharic
+                  ? "ስቱዲዮ / ንግድ"
+                  : "Studio / Comm"}
               </span>
             </div>
             <div className="flex items-center gap-1.5">
               <Bath className="w-4 h-4 text-[#C59B38]" />
               <span>
-                {property.bathrooms} {isAmharic ? "መታጠቢያ" : "Baths"}
+                {property.bathrooms > 0
+                  ? `${property.bathrooms} ${isAmharic ? "መታጠቢያ" : "Baths"}`
+                  : isAmharic
+                  ? "የጋራ"
+                  : "Shared"}
               </span>
             </div>
             <div className="flex items-center gap-1.5">

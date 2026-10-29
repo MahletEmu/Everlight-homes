@@ -121,10 +121,10 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col md:flex-row items-center justify-between text-xs text-stone-400 gap-4">
-          <p>
+          <p className="font-medium text-stone-500">
             {isAmharic
-              ? "© 2026 ኤቨርላይት ሆምስ ባህር ዳር። መብቱ በህግ የተጠበቀ ነው።"
-              : "© 2026 Everlight Homes Bahir Dar. All rights reserved."}
+              ? "© 2026 ኤቨርላይት ሆምስ | በ Mahlet Nigussie በጥራት የተገነባ"
+              : "© 2026 Everlight Homes | Architected & Coded by Mahlet Nigussie"}
           </p>
           <div className="flex gap-6">
             <Link href="/#privacy" className="hover:text-stone-600 transition-colors">

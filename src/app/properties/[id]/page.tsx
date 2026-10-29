@@ -239,7 +239,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     Bedrooms
                   </span>
                   <span className="text-sm font-bold text-[#0A1426]">
-                    {property.bedrooms} Beds
+                    {property.bedrooms > 0 ? `${property.bedrooms} Beds` : "Studio / Suite"}
                   </span>
                 </div>
               </div>
@@ -253,7 +253,7 @@ export default async function PropertyDetailPage({ params }: Props) {
                     Bathrooms
                   </span>
                   <span className="text-sm font-bold text-[#0A1426]">
-                    {property.bathrooms} Baths
+                    {property.bathrooms > 0 ? `${property.bathrooms} Baths` : "Shared Bath"}
                   </span>
                 </div>
               </div>
