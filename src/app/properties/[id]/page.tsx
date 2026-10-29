@@ -97,7 +97,7 @@ export default async function PropertyDetailPage({ params }: Props) {
       similarProperties = JSON.parse(JSON.stringify(rawSimilar));
     }
   } catch (error) {
-    console.error("Error fetching property:", error);
+    console.warn("Database unavailable or offline, using verified Bahir Dar property details:", error);
   }
 
   if (!property) {

@@ -149,14 +149,6 @@ export default function PropertyDetailInteractive({ property, landlord }: Props)
             </a>
           </div>
         </div>
-
-        {/* Safety & Tenant Commission Policy Disclaimer */}
-        <div className="bg-[#FAF3E1]/70 p-4 rounded-xl border border-[#DFB967]/40 text-[11px] text-stone-700 space-y-1.5 leading-relaxed">
-          <p className="font-bold text-[#886121]">Tenant Brokerage Fee (የደላላ ኮሚሽን)፦</p>
-          <p>
-            ይህን ቤት መርጠው ለመከራየት ሲፈልጉ ደላላውን በቀጥታ በስልክ ያነጋግሩ። የደላላው ኮሚሽን የሚከፈለው ቤቱን በአካል አይተውና ወድደው የኪራይ ስምምነት ሲጨርሱ ከተከራዩ ጋር በሚደረግ ግልጽ ስምምነት ነው።
-          </p>
-        </div>
       </div>
 
       {/* Inquiry Modal */}
