@@ -266,18 +266,15 @@ function NewPropertyContent() {
                 </div>
 
                 <div>
-                  <label htmlFor="prop-city" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
+                  <label className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
                     City (Bahir Dar Only / ባህር ዳር)
                   </label>
-                  <select
-                    id="prop-city"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 focus:outline-none"
-                    disabled
-                  >
-                    <option value="Bahir Dar">Bahir Dar (ባህር ዳር)</option>
-                  </select>
+                  <input
+                    type="text"
+                    readOnly
+                    value="Bahir Dar (ባህር ዳር)"
+                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 text-stone-700 cursor-default select-none focus:outline-none font-medium"
+                  />
                 </div>
               </div>
 
