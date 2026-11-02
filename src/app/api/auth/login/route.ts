@@ -41,21 +41,27 @@ export async function POST(req: Request) {
     }
 
     if (dbAvailable) {
-      // Explicitly select passwordHash
-      const user = await User.findOne({ email }).select("+passwordHash");
-      if (user && user.passwordHash) {
-        targetUser = {
-          _id: user._id.toString(),
-          name: user.name,
-          email: user.email,
-          role: user.role as UserRole,
-          passwordHash: user.passwordHash,
-          accountStatus: user.accountStatus,
-          isVerified: user.isVerified,
-        };
+      try {
+        // Explicitly select passwordHash
+        const user = await User.findOne({ email: email.toLowerCase().trim() }).select("+passwordHash");
+        if (user && user.passwordHash) {
+          targetUser = {
+            _id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+            role: user.role as UserRole,
+            passwordHash: user.passwordHash,
+            accountStatus: user.accountStatus,
+            isVerified: user.isVerified,
+          };
+        }
+      } catch (err) {
+        console.warn("DB user find error, checking fallback:", err);
       }
-    } else {
-      // Offline fallback: check in-memory store
+    }
+
+    // Always check in-memory fallback if user not found in DB
+    if (!targetUser) {
       const mock = findMockUserByEmail(email);
       if (mock) {
         targetUser = {

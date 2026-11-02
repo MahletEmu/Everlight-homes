@@ -1,4 +1,5 @@
 import { IUser, UserRole } from "@/types";
+import bcrypt from "bcryptjs";
 
 declare global {
   var mockUsersCache: Map<string, IUser & { passwordHash: string }> | undefined;
@@ -9,6 +10,56 @@ const mockUsers: Map<string, IUser & { passwordHash: string }> =
 
 if (!global.mockUsersCache) {
   global.mockUsersCache = mockUsers;
+}
+
+// Pre-seed Default Administrator and Demo Accounts
+const ADMIN_ID = "admin-master-id-1";
+const LANDLORD_DEMO_ID = "landlord-bd-demo-1";
+const TENANT_DEMO_ID = "tenant-bd-demo-1";
+
+if (!mockUsers.has(ADMIN_ID)) {
+  mockUsers.set(ADMIN_ID, {
+    _id: ADMIN_ID,
+    name: "Everlight Head Moderator",
+    email: "admin@everlight.et",
+    passwordHash: bcrypt.hashSync("EverlightAdmin2026!", 10),
+    role: "admin",
+    phone: "+251 911 000 001",
+    accountStatus: "active",
+    isVerified: true,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  });
+}
+
+if (!mockUsers.has(LANDLORD_DEMO_ID)) {
+  mockUsers.set(LANDLORD_DEMO_ID, {
+    _id: LANDLORD_DEMO_ID,
+    name: "Tewodros Kassahun",
+    email: "landlord1@everlight.et",
+    passwordHash: bcrypt.hashSync("Password123!", 10),
+    role: "landlord",
+    phone: "+251 911 223 344",
+    accountStatus: "active",
+    isVerified: true,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  });
+}
+
+if (!mockUsers.has(TENANT_DEMO_ID)) {
+  mockUsers.set(TENANT_DEMO_ID, {
+    _id: TENANT_DEMO_ID,
+    name: "Yonas Mekonnen",
+    email: "tenant1@everlight.et",
+    passwordHash: bcrypt.hashSync("Password123!", 10),
+    role: "tenant",
+    phone: "+251 933 889 900",
+    accountStatus: "active",
+    isVerified: true,
+    createdAt: "2026-01-01T00:00:00.000Z",
+    updatedAt: "2026-01-01T00:00:00.000Z",
+  });
 }
 
 export function findMockUserByEmail(email: string): (IUser & { passwordHash: string }) | null {
@@ -49,4 +100,3 @@ export function createMockUser(data: {
   mockUsers.set(id, newUser);
   return newUser;
 }
-
