@@ -82,7 +82,7 @@ export default function PropertyDetailInteractive({ property, landlord }: Props)
               disabled
               className="w-full bg-stone-200 text-stone-500 py-3.5 rounded-xl text-sm font-semibold cursor-not-allowed"
             >
-              Property Rented / Unavailable
+              {isAmharic ? "ቤቱ ተከራይቷል / ዝግጁ አይደለም" : "Property Rented / Unavailable"}
             </button>
           )}
 
@@ -91,7 +91,11 @@ export default function PropertyDetailInteractive({ property, landlord }: Props)
             className="w-full py-2.5 rounded-xl text-xs font-semibold text-stone-500 hover:text-rose-600 hover:bg-rose-50/50 flex items-center justify-center gap-1.5 transition-colors"
           >
             <AlertTriangle className="w-3.5 h-3.5 text-stone-400" />
-            <span>Report suspicious listing or incorrect info</span>
+            <span>
+              {isAmharic
+                ? "አጠራጣሪ ቤት ወይም የተሳሳተ መረጃ ሪፖርት አድርግ"
+                : "Report suspicious listing or incorrect info"}
+            </span>
           </button>
         </div>
 

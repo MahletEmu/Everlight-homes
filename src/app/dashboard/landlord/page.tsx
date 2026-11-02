@@ -20,9 +20,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import VerificationBadge from "@/components/VerificationBadge";
 import { IProperty, IRentalInquiry, IRentalAgreement, ICommissionRecord } from "@/types";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function LandlordDashboardContent() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const isAmharic = language === "am";
   const [activeTab, setActiveTab] = useState<"properties" | "inquiries" | "agreements" | "commissions">("properties");
 
   const [properties, setProperties] = useState<IProperty[]>([]);
@@ -166,13 +169,15 @@ function LandlordDashboardContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB967] block mb-1">
-              LANDLORD & PROPERTY MANAGER
+              {isAmharic ? "የአከራዮች እና ንብረት አስተዳዳሪ ማዕከል" : "LANDLORD & PROPERTY MANAGER"}
             </span>
             <h1 className="text-3xl font-extrabold tracking-tight">
-              Landlord Management Center
+              {isAmharic ? "የአከራይ ማስተዳደሪያ ማዕከል" : "Landlord Management Center"}
             </h1>
             <p className="text-xs text-stone-300 mt-1">
-              Manage your residential listings, inspect tenant inquiries, and oversee commissions.
+              {isAmharic
+                ? "የሚያከራዩትን ቤት ያስተዳድሩ፣ የተከራይ ጥያቄዎችን ይመልከቱ እና የኮሚሽን ክፍያን ይከታተሉ።"
+                : "Manage your residential listings, inspect tenant inquiries, and oversee commissions."}
             </p>
           </div>
 
@@ -181,7 +186,7 @@ function LandlordDashboardContent() {
             className="btn-gold rounded-full px-5 py-3 text-xs font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>Add New Property</span>
+            <span>{isAmharic ? "አዲስ ቤት መዝግብ" : "Add New Property"}</span>
           </Link>
         </div>
       </div>
@@ -205,7 +210,7 @@ function LandlordDashboardContent() {
             }`}
           >
             <Building2 className="w-4 h-4 text-[#C59B38]" />
-            <span>My Properties ({properties.length})</span>
+            <span>{isAmharic ? "የኔ ቤቶች" : "My Properties"} ({properties.length})</span>
           </button>
 
           <button
@@ -217,7 +222,7 @@ function LandlordDashboardContent() {
             }`}
           >
             <Calendar className="w-4 h-4 text-blue-600" />
-            <span>Tenant Inquiries ({inquiries.length})</span>
+            <span>{isAmharic ? "የተከራይ ጥያቄዎች" : "Tenant Inquiries"} ({inquiries.length})</span>
           </button>
 
           <button
@@ -229,7 +234,7 @@ function LandlordDashboardContent() {
             }`}
           >
             <FileText className="w-4 h-4 text-emerald-600" />
-            <span>Agreements ({agreements.length})</span>
+            <span>{isAmharic ? "የኪራይ ውሎች" : "Agreements"} ({agreements.length})</span>
           </button>
 
           <button
@@ -241,7 +246,7 @@ function LandlordDashboardContent() {
             }`}
           >
             <BadgePercent className="w-4 h-4 text-[#C59B38]" />
-            <span>Commissions ({commissions.length})</span>
+            <span>{isAmharic ? "የኮሚሽን ክፍያዎች" : "Commissions"} ({commissions.length})</span>
           </button>
         </div>
 

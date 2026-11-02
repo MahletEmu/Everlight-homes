@@ -17,9 +17,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PropertyCard from "@/components/PropertyCard";
 import { IFavorite, IRentalInquiry, IRentalAgreement, IReportDispute } from "@/types";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function TenantDashboardContent() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const isAmharic = language === "am";
   const searchParams = useSearchParams();
   const initialTab = searchParams.get("tab") || "saved";
 
@@ -107,13 +110,15 @@ function TenantDashboardContent() {
       <div className="bg-[#0A1426] text-white py-10 border-b border-stone-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB967] block mb-1">
-            TENANT PORTAL
+            {isAmharic ? "የተከራዮች ፖርታል" : "TENANT PORTAL"}
           </span>
           <h1 className="text-3xl font-extrabold tracking-tight">
-            My Resident Dashboard
+            {isAmharic ? "የተከራይ ዳሽቦርድ" : "My Resident Dashboard"}
           </h1>
           <p className="text-xs text-stone-300 mt-1">
-            Manage your saved properties, viewing inquiries, and verified rental agreements.
+            {isAmharic
+              ? "የተቀመጡ ቤቶችዎን፣ የጉብኝት ጥያቄዎችን እና የተረጋገጡ የኪራይ ውሎችን እዚህ ያስተዳድሩ።"
+              : "Manage your saved properties, viewing inquiries, and verified rental agreements."}
           </p>
         </div>
       </div>
@@ -138,7 +143,7 @@ function TenantDashboardContent() {
             }`}
           >
             <Bookmark className="w-4 h-4 text-[#C59B38]" />
-            <span>Saved Properties ({favorites.length})</span>
+            <span>{isAmharic ? "የተቀመጡ ቤቶች" : "Saved Properties"} ({favorites.length})</span>
           </button>
 
           <button
@@ -150,7 +155,7 @@ function TenantDashboardContent() {
             }`}
           >
             <Calendar className="w-4 h-4 text-[#C59B38]" />
-            <span>Inquiries & Viewings ({inquiries.length})</span>
+            <span>{isAmharic ? "የጉብኝት ጥያቄዎች" : "Inquiries & Viewings"} ({inquiries.length})</span>
           </button>
 
           <button
@@ -162,7 +167,7 @@ function TenantDashboardContent() {
             }`}
           >
             <FileText className="w-4 h-4 text-emerald-600" />
-            <span>Rental Agreements ({agreements.length})</span>
+            <span>{isAmharic ? "የኪራይ ውሎች" : "Rental Agreements"} ({agreements.length})</span>
           </button>
 
           <button
@@ -174,7 +179,7 @@ function TenantDashboardContent() {
             }`}
           >
             <AlertTriangle className="w-4 h-4 text-amber-600" />
-            <span>My Reports ({disputes.length})</span>
+            <span>{isAmharic ? "የላኳቸው ሪፖርቶች" : "My Reports"} ({disputes.length})</span>
           </button>
         </div>
 

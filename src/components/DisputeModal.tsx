@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { X, AlertTriangle, Send, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface Props {
   targetType: "property" | "landlord" | "tenant" | "agreement" | "commission";
@@ -18,6 +19,9 @@ export default function DisputeModal({
   isOpen,
   onClose,
 }: Props) {
+  const { language } = useLanguage();
+  const isAmharic = language === "am";
+
   const [reason, setReason] = useState("");
   const [description, setDescription] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,9 +81,13 @@ export default function DisputeModal({
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-[#0A1426]">Report Submitted</h3>
+            <h3 className="text-xl font-bold text-[#0A1426]">
+              {isAmharic ? "ሪፖርትዎ በተሳካ ሁኔታ ደርሷል" : "Report Submitted"}
+            </h3>
             <p className="text-xs text-stone-500 max-w-sm mx-auto">
-              Everlight administrators have received your report and will investigate promptly.
+              {isAmharic
+                ? "የኤቨርላይት አስተዳዳሪዎች ሪፖርትዎን ተቀብለው ፈጣን ምርመራ ያደርጋሉ።"
+                : "Everlight administrators have received your report and will investigate promptly."}
             </p>
           </div>
         ) : (
@@ -87,12 +95,16 @@ export default function DisputeModal({
             <div className="flex items-center gap-2 text-amber-600">
               <AlertTriangle className="w-5 h-5 shrink-0" />
               <span className="text-xs font-bold uppercase tracking-wider">
-                SUBMIT REPORT / DISPUTE
+                {isAmharic ? "ይፋዊ ሪፖርት / ቅሬታ ማቅረቢያ" : "SUBMIT REPORT / DISPUTE"}
               </span>
             </div>
 
             <h3 className="text-lg font-bold text-[#0A1426]">
-              {targetTitle ? `Report: ${targetTitle}` : "Submit an Official Report"}
+              {targetTitle
+                ? `${isAmharic ? "ሪፖርት:" : "Report:"} ${targetTitle}`
+                : isAmharic
+                ? "ይፋዊ ሪፖርት ያቅርቡ"
+                : "Submit an Official Report"}
             </h3>
 
             {error && (
@@ -103,7 +115,7 @@ export default function DisputeModal({
 
             <div>
               <label htmlFor="dispute-reason" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                Primary Reason
+                {isAmharic ? "ዋናው ምክንያት" : "Primary Reason"}
               </label>
               <select
                 id="dispute-reason"
@@ -112,19 +124,31 @@ export default function DisputeModal({
                 onChange={(e) => setReason(e.target.value)}
                 className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
               >
-                <option value="">Select a reason...</option>
-                <option value="Inaccurate listing information">Inaccurate listing information</option>
-                <option value="Suspected fraudulent ownership">Suspected fraudulent ownership</option>
-                <option value="Off-platform fee extortion">Off-platform fee extortion</option>
-                <option value="Agreement breach">Agreement terms breach</option>
-                <option value="Commission policy violation">Commission policy violation</option>
-                <option value="Other grievance">Other grievance</option>
+                <option value="">{isAmharic ? "ምክንያት ይምረጡ..." : "Select a reason..."}</option>
+                <option value="Inaccurate listing information">
+                  {isAmharic ? "የተሳሳተ የቤት መረጃ ወይም ፎቶ" : "Inaccurate listing information"}
+                </option>
+                <option value="Suspected fraudulent ownership">
+                  {isAmharic ? "አጠራጣሪ ወይም አጭበርባሪ የቤት ባለቤት" : "Suspected fraudulent ownership"}
+                </option>
+                <option value="Off-platform fee extortion">
+                  {isAmharic ? "ከመድረኩ ውጭ ያልተገባ ተጨማሪ ክፍያ መጠየቅ" : "Off-platform fee extortion"}
+                </option>
+                <option value="Agreement breach">
+                  {isAmharic ? "የኪራይ ውል ደንብ ጥሰት" : "Agreement terms breach"}
+                </option>
+                <option value="Commission policy violation">
+                  {isAmharic ? "የኮሚሽን ደንብ ጥሰት" : "Commission policy violation"}
+                </option>
+                <option value="Other grievance">
+                  {isAmharic ? "ሌላ አቤቱታ / ቅሬታ" : "Other grievance"}
+                </option>
               </select>
             </div>
 
             <div>
               <label htmlFor="dispute-description" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                Detailed Explanation
+                {isAmharic ? "ዝርዝር ማብራሪያ" : "Detailed Explanation"}
               </label>
               <textarea
                 id="dispute-description"
@@ -132,7 +156,11 @@ export default function DisputeModal({
                 required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Please describe what happened in detail, including dates or specific communications..."
+                placeholder={
+                  isAmharic
+                    ? "ያጋጠመዎትን ችግር፣ የተፈጠረበትን ሁኔታ ወይም የተሳሳተውን መረጃ በዝርዝር እዚህ ይግለጹ..."
+                    : "Please describe what happened in detail, including dates or specific communications..."
+                }
                 className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none"
               />
             </div>
@@ -144,7 +172,15 @@ export default function DisputeModal({
                 className="w-full bg-rose-600 hover:bg-rose-700 text-white py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-60"
               >
                 <Send className="w-4 h-4" />
-                <span>{loading ? "Submitting..." : "Submit to Moderation Team"}</span>
+                <span>
+                  {loading
+                    ? isAmharic
+                      ? "በመላክ ላይ..."
+                      : "Submitting..."
+                    : isAmharic
+                    ? "ሪፖርቱን ለአስተዳዳሪዎች ላክ"
+                    : "Submit to Moderation Team"}
+                </span>
               </button>
             </div>
           </form>

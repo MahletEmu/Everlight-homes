@@ -13,6 +13,7 @@ import {
   IReportDispute,
   IAuditLog,
 } from "@/types";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface AdminStats {
   totalProperties: number;
@@ -30,6 +31,8 @@ interface AdminStats {
 
 function AdminDashboardContent() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const isAmharic = language === "am";
   const [activeTab, setActiveTab] = useState<
     "overview" | "moderation" | "verifications" | "commissions" | "disputes" | "audit_logs"
   >("overview");
@@ -224,13 +227,15 @@ function AdminDashboardContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#DFB967] block mb-1">
-              CENTRAL ADMINISTRATION & MODERATION
+              {isAmharic ? "ማዕከላዊ የአስተዳደር እና ቁጥጥር ዳሽቦርድ" : "CENTRAL ADMINISTRATION & MODERATION"}
             </span>
             <h1 className="text-3xl font-extrabold tracking-tight">
-              Everlight Operations Console
+              {isAmharic ? "የኤቨርላይት ስራ ማስኬጃ ኮንሶል" : "Everlight Operations Console"}
             </h1>
             <p className="text-xs text-stone-300 mt-1">
-              Live moderation, dispute resolution, honest verification tiers, and auditable commission reconciliation.
+              {isAmharic
+                ? "የቤቶች ግምገማ፣ የባለቤትነት ማረጋገጫ፣ የኮሚሽን ክትትል እና ቅሬታዎች አፈታት።"
+                : "Live moderation, dispute resolution, honest verification tiers, and auditable commission reconciliation."}
             </p>
           </div>
         </div>
@@ -254,7 +259,7 @@ function AdminDashboardContent() {
                 : "border-transparent text-stone-500 hover:text-stone-900"
             }`}
           >
-            System Overview
+            {isAmharic ? "የሲስተም አጠቃላይ እይታ" : "System Overview"}
           </button>
 
           <button
@@ -265,7 +270,7 @@ function AdminDashboardContent() {
                 : "border-transparent text-stone-500 hover:text-stone-900"
             }`}
           >
-            <span>Property Moderation</span>
+            <span>{isAmharic ? "ቤቶችን መገምገም" : "Property Moderation"}</span>
             {stats && stats.pendingProperties > 0 && (
               <span className="w-5 h-5 rounded-full bg-amber-500 text-white text-[10px] font-bold flex items-center justify-center">
                 {stats.pendingProperties}
@@ -281,7 +286,7 @@ function AdminDashboardContent() {
                 : "border-transparent text-stone-500 hover:text-stone-900"
             }`}
           >
-            <span>Verification Queue</span>
+            <span>{isAmharic ? "የማረጋገጫ ወረፋ" : "Verification Queue"}</span>
           </button>
 
           <button
@@ -292,7 +297,7 @@ function AdminDashboardContent() {
                 : "border-transparent text-stone-500 hover:text-stone-900"
             }`}
           >
-            <span>Commission Reconciliation</span>
+            <span>{isAmharic ? "የኮሚሽን ክትትል" : "Commission Reconciliation"}</span>
           </button>
 
           <button
@@ -303,7 +308,7 @@ function AdminDashboardContent() {
                 : "border-transparent text-stone-500 hover:text-stone-900"
             }`}
           >
-            <span>Disputes & Reports</span>
+            <span>{isAmharic ? "ቅሬታዎች እና ሪፖርቶች" : "Disputes & Reports"}</span>
             {stats && stats.openDisputes > 0 && (
               <span className="w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] font-bold flex items-center justify-center">
                 {stats.openDisputes}
@@ -319,7 +324,7 @@ function AdminDashboardContent() {
                 : "border-transparent text-stone-500 hover:text-stone-900"
             }`}
           >
-            Audit Logs
+            {isAmharic ? "የእንቅስቃሴ መዝገብ" : "Audit Logs"}
           </button>
         </div>
 
@@ -474,7 +479,7 @@ function AdminDashboardContent() {
                           target="_blank"
                           className="px-3.5 py-2 rounded-xl border border-stone-200 text-xs font-semibold text-stone-700 hover:bg-stone-50"
                         >
-                          Preview Listing
+                          {isAmharic ? "ቤቱን እይ" : "Preview Listing"}
                         </Link>
 
                         {prop.moderationStatus !== "approved" && (
@@ -482,7 +487,7 @@ function AdminDashboardContent() {
                             onClick={() => handleModerateProperty(prop._id, "approved")}
                             className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-semibold"
                           >
-                            Approve
+                            {isAmharic ? "አጽድቅ" : "Approve"}
                           </button>
                         )}
 
@@ -491,7 +496,7 @@ function AdminDashboardContent() {
                             onClick={() => handleModerateProperty(prop._id, "rejected")}
                             className="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-xl text-xs font-semibold"
                           >
-                            Reject
+                            {isAmharic ? "ውድቅ አድርግ" : "Reject"}
                           </button>
                         )}
                       </div>
@@ -560,7 +565,7 @@ function AdminDashboardContent() {
                             }
                             className="px-3.5 py-1.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-800 text-xs font-semibold hover:bg-blue-100"
                           >
-                            Mark Owner ID Verified
+                            {isAmharic ? "የባለቤት መታወቂያ ተረጋግጧል" : "Mark Owner ID Verified"}
                           </button>
 
                           <button
@@ -569,7 +574,7 @@ function AdminDashboardContent() {
                             }
                             className="px-3.5 py-1.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 text-xs font-semibold hover:bg-emerald-100"
                           >
-                            Mark Fully Verified & Inspected
+                            {isAmharic ? "በአካል ተጎብኝቶ ሙሉ በሙሉ ተረጋግጧል" : "Mark Fully Verified & Inspected"}
                           </button>
 
                           <button
@@ -578,7 +583,7 @@ function AdminDashboardContent() {
                             }
                             className="px-3.5 py-1.5 rounded-xl border border-rose-200 bg-rose-50 text-rose-800 text-xs font-semibold hover:bg-rose-100"
                           >
-                            Reject Verification
+                            {isAmharic ? "ማረጋገጫውን ውድቅ አድርግ" : "Reject Verification"}
                           </button>
                         </div>
                       </div>
@@ -651,7 +656,7 @@ function AdminDashboardContent() {
                             }}
                             className="btn-gold px-4 py-2 rounded-xl text-xs font-semibold shadow-sm"
                           >
-                            Reconcile Payment Received
+                            {isAmharic ? "የተከፈለውን ኮሚሽን አረጋግጥና መዝግብ" : "Reconcile Payment Received"}
                           </button>
                         )}
                       </div>
@@ -707,7 +712,7 @@ function AdminDashboardContent() {
                             onClick={() => handleResolveDispute(disp._id)}
                             className="btn-navy px-4 py-2 rounded-xl text-xs font-semibold"
                           >
-                            Resolve Dispute & Add Notes
+                            {isAmharic ? "ቅሬታውን ፈታ & ማስታወሻ አስቀምጥ" : "Resolve Dispute & Add Notes"}
                           </button>
                         )}
                       </div>
@@ -723,10 +728,10 @@ function AdminDashboardContent() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-stone-50 border-b border-stone-200 text-stone-500 uppercase tracking-wider">
                     <tr>
-                      <th className="p-3.5">Action</th>
-                      <th className="p-3.5">Resource</th>
-                      <th className="p-3.5">Admin</th>
-                      <th className="p-3.5">Timestamp</th>
+                      <th className="p-3.5">{isAmharic ? "የተወሰደ እርምጃ (Action)" : "Action"}</th>
+                      <th className="p-3.5">{isAmharic ? "የተቀየረው መረጃ (Resource)" : "Resource"}</th>
+                      <th className="p-3.5">{isAmharic ? "ፈጻሚው አስተዳዳሪ (Admin)" : "Admin"}</th>
+                      <th className="p-3.5">{isAmharic ? "ቀን እና ሰዓት (Timestamp)" : "Timestamp"}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-100">
