@@ -97,7 +97,17 @@ export default function InquiryModal({
 
             {error && (
               <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs">
-                {error}
+                <span>{error}</span>
+                {error.toLowerCase().includes("sign in") && (
+                  <div className="mt-2 pt-2 border-t border-rose-200">
+                    <a
+                      href="/auth/login"
+                      className="font-bold underline text-rose-800 hover:text-rose-950 inline-flex items-center gap-1"
+                    >
+                      ወደ መለያዎ ይግቡ (Sign in to your account) →
+                    </a>
+                  </div>
+                )}
               </div>
             )}
 
