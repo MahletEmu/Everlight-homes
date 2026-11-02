@@ -15,23 +15,46 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { BAHIR_DAR_NEIGHBORHOODS, PROPERTY_TYPES, AMENITIES_LIST } from "@/lib/constants";
 import { IPropertyImage } from "@/types";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
+
+const PROPERTY_TYPE_LABELS: Record<string, { en: string; am: string }> = {
+  apartment: { en: "Modern Apartment", am: "ዘመናዊ አፓርታማ" },
+  house: { en: "Stand-Alone Villa / House", am: "የግል ቪላ / መኖሪያ ቤት" },
+  condo: { en: "Condominium (G+)", am: "ኮንዶሚኒየም" },
+  private_room: { en: "Private Room", am: "ነጠላ የግል ክፍል" },
+  shared: { en: "Shared Accommodation", am: "የጋራ ክፍል" },
+  commercial: { en: "Office / Commercial Space", am: "የንግድ / የቢሮ ቦታ" },
+};
+
+const AMENITY_LABELS: Record<string, { en: string; am: string }> = {
+  backup_generator: { en: "Backup Generator", am: "ተጠባባቂ ጄኔሬተር" },
+  water_tank: { en: "Water Reservoir Tank", am: "የውኃ ማጠራቀሚያ ታንከር" },
+  wifi: { en: "High-Speed Internet / WiFi", am: "ፈጣን ዋይፋይ / ኢንተርኔት" },
+  parking: { en: "Dedicated Parking Space", am: "የመኪና ማቆሚያ (ፓርኪንግ)" },
+  security: { en: "24/7 Security & Guard", am: "የ24 ሰዓት ጥበቃ" },
+  furnished: { en: "Fully Furnished", am: "የተሟሉ የቤት እቃዎች" },
+  modern_kitchen: { en: "Modern Fitted Kitchen", am: "ዘመናዊ ኩሽና" },
+  balcony: { en: "Balcony / Scenic View", am: "በረንዳ / ውብ እይታ" },
+  elevator: { en: "Elevator / Lift", am: "ሊፍት" },
+  garden: { en: "Private Garden / Compound", am: "የግል ግቢ / አትክልት ስፍራ" },
+};
 
 function NewPropertyContent() {
   const router = useRouter();
+  const { language } = useLanguage();
+  const isAmharic = language === "am";
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [propertyType, setPropertyType] = useState<string>("apartment");
-  const [monthlyRent, setMonthlyRent] = useState<number>(35000);
-  const [deposit, setDeposit] = useState<number>(35000);
-  const [city, setCity] = useState<string>("Bahir Dar");
+  const [monthlyRent, setMonthlyRent] = useState<number | "">("");
+  const [city] = useState<string>("Bahir Dar");
   const [neighborhood, setNeighborhood] = useState<string>(BAHIR_DAR_NEIGHBORHOODS[0]);
   const [addressDetails, setAddressDetails] = useState<string>("");
-  const [bedrooms, setBedrooms] = useState<number>(2);
-  const [bathrooms, setBathrooms] = useState<number>(2);
-  const [sizeM2, setSizeM2] = useState<number>(110);
+  const [bedrooms, setBedrooms] = useState<number | "">(2);
+  const [bathrooms, setBathrooms] = useState<number | "">(1);
+  const [sizeM2, setSizeM2] = useState<number | "">("");
   const [amenities, setAmenities] = useState<string[]>([
-    "backup_generator",
     "water_tank",
     "security",
   ]);
@@ -74,7 +97,7 @@ function NewPropertyContent() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to upload image");
+      if (!res.ok) throw new Error(data.error || (isAmharic ? "ፎቶውን መጫን አልተቻለም" : "Failed to upload image"));
 
       setImages((prev) => [
         ...prev,
@@ -86,7 +109,7 @@ function NewPropertyContent() {
       ]);
     } catch (err: unknown) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setError((err as any)?.message || "Image upload failed");
+      setError((err as any)?.message || (isAmharic ? "ፎቶውን መጫን አልተቻለም" : "Image upload failed"));
     } finally {
       setUploadingImage(false);
       e.target.value = "";
@@ -129,7 +152,12 @@ function NewPropertyContent() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (images.length === 0) {
-      setError("Please add at least one property photograph.");
+      setError(isAmharic ? "እባክዎ ቢያንስ አንድ የቤት ፎቶ ያስገቡ።" : "Please add at least one property photograph.");
+      return;
+    }
+
+    if (!monthlyRent || Number(monthlyRent) < 500) {
+      setError(isAmharic ? "እባክዎ ትክክለኛ የወር ኪራይ ዋጋ ያስገቡ (ቢያንስ 500 ብር)።" : "Please enter a valid monthly rent (at least 500 ETB).");
       return;
     }
 
@@ -144,14 +172,14 @@ function NewPropertyContent() {
           title,
           description,
           propertyType,
-          monthlyRent,
-          deposit,
+          monthlyRent: Number(monthlyRent),
+          deposit: 0, // Security deposit removed from UI as requested
           city,
           neighborhood,
           addressDetails,
-          bedrooms,
-          bathrooms,
-          sizeM2,
+          bedrooms: Number(bedrooms) || 0,
+          bathrooms: Number(bathrooms) || 1,
+          sizeM2: Number(sizeM2) || 50,
           amenities,
           images,
         }),
@@ -159,7 +187,7 @@ function NewPropertyContent() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create listing");
+        throw new Error(data.error || (isAmharic ? "ቤቱን መመዝገብ አልተቻለም" : "Failed to create listing"));
       }
 
       setSuccess(true);
@@ -168,7 +196,7 @@ function NewPropertyContent() {
       }, 2000);
     } catch (err: unknown) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setError((err as any)?.message || "Failed to publish listing");
+      setError((err as any)?.message || (isAmharic ? "ቤቱን መመዝገብ አልተቻለም" : "Failed to submit property"));
     } finally {
       setSubmitting(false);
     }
@@ -179,25 +207,27 @@ function NewPropertyContent() {
       <Navbar />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
-        {/* Back Link */}
+        {/* Navigation Breadcrumb */}
         <Link
           href="/dashboard/landlord"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-stone-500 hover:text-[#0A1426] mb-6 transition-colors"
         >
           <ArrowLeft className="w-3.5 h-3.5" />
-          <span>Back to Landlord Dashboard</span>
+          <span>{isAmharic ? "← ወደ አከራይ ዳሽቦርድ ተመለስ" : "Back to Landlord Dashboard"}</span>
         </Link>
 
-        {/* Title Header */}
+        {/* Page Header */}
         <div className="mb-8">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#C59B38] block mb-1">
-            NEW LISTING WORKFLOW
+          <span className="text-[11px] font-bold text-[#C59B38] uppercase tracking-wider block mb-1">
+            {isAmharic ? "አዲስ የሚከራይ ቤት መመዝገቢያ" : "NEW LISTING WORKFLOW"}
           </span>
-          <h1 className="text-3xl font-extrabold text-[#0A1426] tracking-tight">
-            Add a New Rental Property
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#0A1426] tracking-tight mb-2">
+            {isAmharic ? "አዲስ የሚከራይ ቤት መዝግብ" : "Add a New Rental Property"}
           </h1>
-          <p className="text-xs text-stone-500 mt-1">
-            Provide accurate property specifications. Listings are reviewed by Everlight moderators prior to public indexing.
+          <p className="text-xs text-stone-500 leading-relaxed max-w-2xl">
+            {isAmharic
+              ? "ትክክለኛ የቤት መረጃዎችን ያስገቡ። የተመዘገቡ ቤቶች ለህዝብ ከመታየታቸው በፊት በአስተዳዳሪው ይገመገማሉ።"
+              : "Provide accurate property specifications. Listings are reviewed by Everlight moderators prior to public indexing."}
           </p>
         </div>
 
@@ -214,13 +244,15 @@ function NewPropertyContent() {
               <CheckCircle2 className="w-10 h-10" />
             </div>
             <h2 className="text-2xl font-bold text-[#0A1426]">
-              Listing Submitted for Review!
+              {isAmharic ? "ቤቱ በተሳካ ሁኔታ ተመዝግቧል!" : "Listing Submitted for Review!"}
             </h2>
             <p className="text-xs text-stone-500 max-w-md mx-auto">
-              Your property has been registered in the system. An Everlight moderator will review the details and initiate identity/inspection verifications.
+              {isAmharic
+                ? "የቤትዎ መረጃ በሲስተሙ ተመዝግቧል። አስተዳዳሪው ፈትሾ ካረጋገጠ በኋላ ለተከራዮች ክፍት ይሆናል።"
+                : "Your property has been registered in the system. An Everlight moderator will review the details and initiate identity/inspection verifications."}
             </p>
             <p className="text-xs text-[#A97E29] font-medium">
-              Redirecting to your dashboard...
+              {isAmharic ? "ወደ ዳሽቦርድዎ እየተመለሰ ነው..." : "Redirecting to your dashboard..."}
             </p>
           </div>
         ) : (
@@ -228,12 +260,12 @@ function NewPropertyContent() {
             {/* Section 1: Overview & Category */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-5">
               <h3 className="text-base font-bold text-[#0A1426] border-b border-stone-100 pb-3">
-                1. Basic Information & Classification
+                {isAmharic ? "1. አጠቃላይ መረጃ እና የቤት አይነት" : "1. Basic Information & Classification"}
               </h3>
 
               <div>
                 <label htmlFor="prop-title" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                  Listing Title
+                  {isAmharic ? "የቤቱ ስም / ርዕስ" : "Listing Title"}
                 </label>
                 <input
                   id="prop-title"
@@ -241,7 +273,11 @@ function NewPropertyContent() {
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Modern 3-Bedroom Executive Villa with Backup Generator in Old Airport"
+                  placeholder={
+                    isAmharic
+                      ? "ለምሳሌ፡ በዲያስፖራ መንደር ባለ 3 መኝታ ዘመናዊ ቪላ"
+                      : "e.g. Modern 3-Bedroom Executive Villa in Diaspora Village"
+                  }
                   className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#C59B38]"
                 />
               </div>
@@ -249,7 +285,7 @@ function NewPropertyContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="prop-category" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Property Category
+                    {isAmharic ? "የቤት ምድብ / አይነት" : "Property Category"}
                   </label>
                   <select
                     id="prop-category"
@@ -259,7 +295,7 @@ function NewPropertyContent() {
                   >
                     {PROPERTY_TYPES.map((pt) => (
                       <option key={pt.id} value={pt.id}>
-                        {pt.label}
+                        {isAmharic ? PROPERTY_TYPE_LABELS[pt.id]?.am || pt.label : pt.label}
                       </option>
                     ))}
                   </select>
@@ -267,12 +303,12 @@ function NewPropertyContent() {
 
                 <div>
                   <label className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    City (Bahir Dar Only / ባህር ዳር)
+                    {isAmharic ? "ከተማ (በባህር ዳር ብቻ)" : "City (Bahir Dar Only)"}
                   </label>
                   <input
                     type="text"
                     readOnly
-                    value="Bahir Dar (ባህር ዳር)"
+                    value={isAmharic ? "ባህር ዳር (ብቸኛ የአገልግሎት ከተማ)" : "Bahir Dar (Exclusive Service Area)"}
                     className="w-full p-2.5 rounded-xl border border-stone-200 text-sm bg-stone-50 text-stone-700 cursor-default select-none focus:outline-none font-medium"
                   />
                 </div>
@@ -281,7 +317,7 @@ function NewPropertyContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="prop-neighborhood" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Bahir Dar Kebele / Area (ቀበሌ / አካባቢ)
+                    {isAmharic ? "የባህር ዳር ቀበሌ / አካባቢ" : "Bahir Dar Kebele / Area"}
                   </label>
                   <select
                     id="prop-neighborhood"
@@ -300,14 +336,18 @@ function NewPropertyContent() {
 
                 <div>
                   <label htmlFor="prop-address" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Specific Address Details (Private to confirmed tenants)
+                    {isAmharic ? "ልዩ አድራሻ (ለተረጋገጡ ተከራዮች ብቻ የሚገለጽ)" : "Specific Address Details (Private to confirmed tenants)"}
                   </label>
                   <input
                     id="prop-address"
                     type="text"
                     value={addressDetails}
                     onChange={(e) => setAddressDetails(e.target.value)}
-                    placeholder="e.g. Near Lake Tana Shore, House No. 104"
+                    placeholder={
+                      isAmharic
+                        ? "ለምሳሌ፡ ጣና ሐይቅ ዳርቻ አቅራቢያ፣ የቤት ቁጥር 104"
+                        : "e.g. Near Lake Tana Shore, House No. 104"
+                    }
                     className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
                   />
                 </div>
@@ -315,7 +355,7 @@ function NewPropertyContent() {
 
               <div>
                 <label htmlFor="prop-description" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                  Detailed Description
+                  {isAmharic ? "ስለ ቤቱ ዝርዝር ማብራሪያ" : "Detailed Description"}
                 </label>
                 <textarea
                   id="prop-description"
@@ -323,7 +363,11 @@ function NewPropertyContent() {
                   required
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe the home interior, finishing, neighborhood advantages, security, and compound..."
+                  placeholder={
+                    isAmharic
+                      ? "ስለ ቤቱ ውስጣዊ አቀማመጥ፣ ስለ ግቢው፣ የመብራትና ውኃ ሁኔታ እንዲሁም ስለ አካባቢው ፀጥታ ያብራሩ..."
+                      : "Describe the home interior, finishing, neighborhood advantages, security, and compound..."
+                  }
                   className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#C59B38]"
                 />
               </div>
@@ -332,44 +376,35 @@ function NewPropertyContent() {
             {/* Section 2: Pricing & Specs */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-5">
               <h3 className="text-base font-bold text-[#0A1426] border-b border-stone-100 pb-3">
-                2. Financials & Physical Specifications
+                {isAmharic ? "2. የዋጋ እና የክፍሎች ዝርዝር" : "2. Financials & Physical Specifications"}
               </h3>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="prop-rent" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Monthly Rent (ETB)
-                  </label>
+              {/* Monthly Rent */}
+              <div>
+                <label htmlFor="prop-rent" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
+                  {isAmharic ? "የወር ኪራይ (በብር)" : "Monthly Rent (ETB)"}
+                </label>
+                <div className="relative">
                   <input
                     id="prop-rent"
                     type="number"
                     required
                     min={500}
                     value={monthlyRent}
-                    onChange={(e) => setMonthlyRent(Number(e.target.value))}
-                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
+                    onChange={(e) => setMonthlyRent(e.target.value === "" ? "" : Number(e.target.value))}
+                    placeholder={isAmharic ? "ለምሳሌ፡ 12,000" : "e.g. 12,000"}
+                    className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#C59B38]"
                   />
-                </div>
-
-                <div>
-                  <label htmlFor="prop-deposit" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Security Deposit (ETB)
-                  </label>
-                  <input
-                    id="prop-deposit"
-                    type="number"
-                    min={0}
-                    value={deposit}
-                    onChange={(e) => setDeposit(Number(e.target.value))}
-                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
-                  />
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">
+                    {isAmharic ? "ብር/ወር" : "ETB /mo"}
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <label htmlFor="prop-bedrooms" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Bedrooms
+                    {isAmharic ? "መኝታ ክፍል" : "Bedrooms"}
                   </label>
                   <input
                     id="prop-bedrooms"
@@ -377,14 +412,15 @@ function NewPropertyContent() {
                     required
                     min={0}
                     value={bedrooms}
-                    onChange={(e) => setBedrooms(Number(e.target.value))}
+                    onChange={(e) => setBedrooms(e.target.value === "" ? "" : Number(e.target.value))}
+                    placeholder={isAmharic ? "ለምሳሌ፡ 2" : "e.g. 2"}
                     className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="prop-bathrooms" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Bathrooms
+                    {isAmharic ? "መታጠቢያ ክፍል" : "Bathrooms"}
                   </label>
                   <input
                     id="prop-bathrooms"
@@ -392,14 +428,15 @@ function NewPropertyContent() {
                     required
                     min={1}
                     value={bathrooms}
-                    onChange={(e) => setBathrooms(Number(e.target.value))}
+                    onChange={(e) => setBathrooms(e.target.value === "" ? "" : Number(e.target.value))}
+                    placeholder={isAmharic ? "ለምሳሌ፡ 1" : "e.g. 1"}
                     className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label htmlFor="prop-size" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                    Area (m²)
+                    {isAmharic ? "ስፋት (ካ.ሜ)" : "Area (m²)"}
                   </label>
                   <input
                     id="prop-size"
@@ -407,7 +444,8 @@ function NewPropertyContent() {
                     required
                     min={10}
                     value={sizeM2}
-                    onChange={(e) => setSizeM2(Number(e.target.value))}
+                    onChange={(e) => setSizeM2(e.target.value === "" ? "" : Number(e.target.value))}
+                    placeholder={isAmharic ? "ለምሳሌ፡ 85" : "e.g. 85"}
                     className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
                   />
                 </div>
@@ -416,7 +454,7 @@ function NewPropertyContent() {
               {/* Amenities */}
               <div>
                 <span className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-2">
-                  Amenities Included
+                  {isAmharic ? "ቤቱ ያካተታቸው አገልግሎቶች" : "Amenities Included"}
                 </span>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {AMENITIES_LIST.map((amenity) => (
@@ -434,7 +472,7 @@ function NewPropertyContent() {
                         onChange={() => toggleAmenity(amenity.id)}
                         className="rounded border-stone-300 text-[#C59B38] focus:ring-[#C59B38]"
                       />
-                      <span>{amenity.label}</span>
+                      <span>{isAmharic ? AMENITY_LABELS[amenity.id]?.am || amenity.label : amenity.label}</span>
                     </label>
                   ))}
                 </div>
@@ -444,7 +482,7 @@ function NewPropertyContent() {
             {/* Section 3: Photography Upload */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200 shadow-sm space-y-5">
               <h3 className="text-base font-bold text-[#0A1426] border-b border-stone-100 pb-3">
-                3. High-Resolution Photographs
+                {isAmharic ? "3. የቤቱ ፎቶዎች" : "3. High-Resolution Photographs"}
               </h3>
 
               {/* Image Previews */}
@@ -464,7 +502,7 @@ function NewPropertyContent() {
                     {/* Primary Badge */}
                     {img.isPrimary ? (
                       <span className="absolute top-2 left-2 bg-[#C59B38] text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md shadow-sm">
-                        Primary Photo
+                        {isAmharic ? "ዋና ፎቶ" : "Primary Photo"}
                       </span>
                     ) : (
                       <button
@@ -472,7 +510,7 @@ function NewPropertyContent() {
                         onClick={() => setPrimary(idx)}
                         className="absolute top-2 left-2 bg-black/60 hover:bg-black/80 text-white text-[9px] font-semibold px-2 py-0.5 rounded-md backdrop-blur-sm transition-all"
                       >
-                        Set Primary
+                        {isAmharic ? "ዋና ፎቶ አድርግ" : "Set Primary"}
                       </button>
                     )}
 
@@ -494,7 +532,9 @@ function NewPropertyContent() {
                 <label className="border-2 border-dashed border-stone-300 hover:border-[#C59B38] p-5 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors bg-stone-50/50 hover:bg-[#FAF3E1]/20">
                   <Upload className="w-6 h-6 text-[#A97E29] mb-1.5" />
                   <span className="text-xs font-bold text-[#0A1426]">
-                    {uploadingImage ? "Uploading file..." : "Upload from Device"}
+                    {uploadingImage
+                      ? (isAmharic ? "ፎቶው እየተጫነ ነው..." : "Uploading file...")
+                      : (isAmharic ? "ፎቶ ከስልክዎ ወይም ከኮምፒውተርዎ ይጫኑ" : "Upload from Device")}
                   </span>
                   <span className="text-[10px] text-stone-400 mt-0.5">
                     JPG, PNG, WEBP (Max 6MB)
@@ -510,7 +550,7 @@ function NewPropertyContent() {
 
                 <div className="border border-stone-200 p-5 rounded-2xl bg-stone-50/50 flex flex-col justify-between">
                   <label htmlFor="image-url-input" className="text-xs font-bold text-[#0A1426] mb-1 block">
-                    Or Add Image via Public URL
+                    {isAmharic ? "ወይም የፎቶ ሊንክ (URL) ያስገቡ" : "Or Add Image via Public URL"}
                   </label>
                   <div className="flex gap-2">
                     <input
@@ -526,7 +566,7 @@ function NewPropertyContent() {
                       onClick={handleAddImageUrl}
                       className="btn-navy px-3 py-2 rounded-xl text-xs font-semibold"
                     >
-                      Add
+                      {isAmharic ? "ጨምር" : "Add"}
                     </button>
                   </div>
                 </div>
@@ -540,7 +580,11 @@ function NewPropertyContent() {
                 disabled={submitting}
                 className="w-full btn-gold py-4 rounded-2xl text-sm font-bold shadow-xl hover:shadow-2xl disabled:opacity-60 transition-all flex items-center justify-center gap-2"
               >
-                <span>{submitting ? "Publishing Listing..." : "Submit Listing for Moderation"}</span>
+                <span>
+                  {submitting
+                    ? (isAmharic ? "ቤቱ እየተመዘገበ ነው..." : "Publishing Listing...")
+                    : (isAmharic ? "ቤቱን ለመመዝገብ ላክ" : "Submit Listing for Moderation")}
+                </span>
               </button>
             </div>
           </form>
