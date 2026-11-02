@@ -76,6 +76,8 @@ export function findMockUserById(id: string): (IUser & { passwordHash: string })
   return mockUsers.get(id) || null;
 }
 
+export const getMockUserById = findMockUserById;
+
 export function createMockUser(data: {
   name: string;
   email: string;

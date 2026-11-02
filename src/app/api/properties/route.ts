@@ -3,7 +3,7 @@ import { connectToDatabase } from "@/lib/mongodb";
 import { Property, VerificationRecord } from "@/lib/models";
 import { getCurrentUser } from "@/lib/auth/session";
 import { PropertySchema } from "@/lib/validation";
-import { BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
+import { addSampleProperty, BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
 
 export async function GET(req: Request) {
   try {
@@ -271,7 +271,7 @@ export async function POST(req: Request) {
         updatedAt: new Date().toISOString(),
       };
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      BAHIR_DAR_SAMPLE_PROPERTIES.unshift(fallbackProperty as any);
+      addSampleProperty(fallbackProperty as any);
 
       return NextResponse.json(
         {

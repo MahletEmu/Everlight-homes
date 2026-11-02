@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Property, AuditLog } from "@/lib/models";
 import { requireRole } from "@/lib/auth/session";
-import { BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
+import { getSamplePropertyById, updateSampleProperty, BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
 
 export async function PATCH(
   req: Request,
@@ -16,7 +16,7 @@ export async function PATCH(
     const { moderationStatus, rejectionReason, verificationStatus, featured } = body;
 
     // Check in-memory sample properties first
-    const sample = BAHIR_DAR_SAMPLE_PROPERTIES.find((p) => p._id === id);
+    const sample = getSamplePropertyById(id) || BAHIR_DAR_SAMPLE_PROPERTIES.find((p) => p._id === id);
     if (sample) {
       if (moderationStatus && ["approved", "rejected", "pending_review"].includes(moderationStatus)) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -34,6 +34,8 @@ export async function PATCH(
       if (typeof featured === "boolean") {
         sample.featured = featured;
       }
+
+      updateSampleProperty(id, sample);
 
       return NextResponse.json({
         message: "Property moderation updated successfully",

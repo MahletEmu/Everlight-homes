@@ -1,6 +1,8 @@
+import fs from "fs";
+import path from "path";
 import { IProperty } from "@/types";
 
-export const BAHIR_DAR_SAMPLE_PROPERTIES: IProperty[] = [
+const INITIAL_SAMPLE_PROPERTIES: IProperty[] = [
   {
     _id: "bd-2",
     landlordId: {
@@ -331,3 +333,110 @@ export const BAHIR_DAR_SAMPLE_PROPERTIES: IProperty[] = [
     updatedAt: "2026-02-26T10:00:00.000Z",
   },
 ];
+
+declare global {
+  var globalMockProperties: IProperty[] | undefined;
+}
+
+const CACHE_FILE = path.join(process.cwd(), ".data", "properties.json");
+
+function ensureDirectoryExists(filePath: string) {
+  const dir = path.dirname(filePath);
+  if (!fs.existsSync(dir)) {
+    try {
+      fs.mkdirSync(dir, { recursive: true });
+    } catch {
+      // ignore
+    }
+  }
+}
+
+function loadPersistedProperties(): IProperty[] {
+  try {
+    if (fs.existsSync(CACHE_FILE)) {
+      const data = fs.readFileSync(CACHE_FILE, "utf-8");
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const merged: IProperty[] = [];
+        const seen = new Set<string>();
+        for (const item of parsed) {
+          if (!seen.has(item._id)) {
+            merged.push(item);
+            seen.add(item._id);
+          }
+        }
+        for (const init of INITIAL_SAMPLE_PROPERTIES) {
+          if (!seen.has(init._id)) {
+            merged.push(init);
+            seen.add(init._id);
+          }
+        }
+        return merged;
+      }
+    }
+  } catch (err) {
+    console.warn("Could not load persisted properties:", err);
+  }
+  return [...INITIAL_SAMPLE_PROPERTIES];
+}
+
+export function savePersistedProperties(properties: IProperty[]) {
+  try {
+    ensureDirectoryExists(CACHE_FILE);
+    fs.writeFileSync(CACHE_FILE, JSON.stringify(properties, null, 2), "utf-8");
+  } catch (err) {
+    console.warn("Could not save persisted properties:", err);
+  }
+}
+
+if (!global.globalMockProperties) {
+  global.globalMockProperties = loadPersistedProperties();
+}
+
+export const BAHIR_DAR_SAMPLE_PROPERTIES: IProperty[] = global.globalMockProperties;
+
+export function addSampleProperty(property: IProperty) {
+  const list = global.globalMockProperties || BAHIR_DAR_SAMPLE_PROPERTIES;
+  // If property already exists, update it, else unshift
+  const existingIdx = list.findIndex((p) => p._id === property._id);
+  if (existingIdx !== -1) {
+    list[existingIdx] = property;
+  } else {
+    list.unshift(property);
+  }
+  savePersistedProperties(list);
+}
+
+export function updateSampleProperty(id: string, updates: Partial<IProperty>): IProperty | null {
+  const list = global.globalMockProperties || BAHIR_DAR_SAMPLE_PROPERTIES;
+  const index = list.findIndex((p) => p._id === id);
+  if (index !== -1) {
+    list[index] = { ...list[index], ...updates, updatedAt: new Date().toISOString() };
+    savePersistedProperties(list);
+    return list[index];
+  }
+  return null;
+}
+
+export function getSamplePropertyById(id: string): IProperty | null {
+  const list = global.globalMockProperties || BAHIR_DAR_SAMPLE_PROPERTIES;
+  const found = list.find((p) => p._id === id);
+  if (found) return found;
+
+  // If not found in current memory array, read fresh from disk cache
+  try {
+    if (fs.existsSync(CACHE_FILE)) {
+      const data = fs.readFileSync(CACHE_FILE, "utf-8");
+      const diskList: IProperty[] = JSON.parse(data);
+      const diskFound = diskList.find((p) => p._id === id);
+      if (diskFound) {
+        list.unshift(diskFound);
+        return diskFound;
+      }
+    }
+  } catch {
+    // ignore
+  }
+
+  return null;
+}

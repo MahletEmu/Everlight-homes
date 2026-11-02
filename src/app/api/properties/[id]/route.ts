@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
+import mongoose from "mongoose";
 import { connectToDatabase } from "@/lib/mongodb";
 import { Property, VerificationRecord } from "@/lib/models";
 import { getCurrentUser } from "@/lib/auth/session";
 import { PropertySchema } from "@/lib/validation";
 
-import { BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
+import { getSamplePropertyById, BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
 import { IProperty, IVerificationRecord } from "@/types";
 
 export async function GET(
@@ -19,32 +20,34 @@ export async function GET(
     let dbVerification: Partial<IVerificationRecord> | null = null;
     let dbSimilar: IProperty[] = [];
 
-    try {
-      await connectToDatabase();
+    if (mongoose.Types.ObjectId.isValid(id)) {
+      try {
+        await connectToDatabase();
 
-      const rawProp = await Property.findById(id)
-        .populate("landlordId", "name isVerified avatarUrl createdAt")
-        .lean();
-      dbProperty = rawProp ? (rawProp as unknown as (IProperty & { landlordId?: { _id?: string; name?: string } | string })) : null;
-
-      if (dbProperty) {
-        const rawVer = await VerificationRecord.findOne({ propertyId: id })
-          .select("ownerVerificationStatus physicalInspectionStatus inspectionDate notes")
+        const rawProp = await Property.findById(id)
+          .populate("landlordId", "name isVerified avatarUrl createdAt")
           .lean();
-        dbVerification = rawVer ? (rawVer as unknown as Partial<IVerificationRecord>) : null;
+        dbProperty = rawProp ? (rawProp as unknown as (IProperty & { landlordId?: { _id?: string; name?: string } | string })) : null;
 
-        const rawSim = await Property.find({
-          _id: { $ne: id },
-          city: dbProperty.city,
-          moderationStatus: "approved",
-          availabilityStatus: "available",
-        })
-          .limit(3)
-          .lean();
-        dbSimilar = rawSim ? (rawSim as unknown as IProperty[]) : [];
+        if (dbProperty) {
+          const rawVer = await VerificationRecord.findOne({ propertyId: id })
+            .select("ownerVerificationStatus physicalInspectionStatus inspectionDate notes")
+            .lean();
+          dbVerification = rawVer ? (rawVer as unknown as Partial<IVerificationRecord>) : null;
+
+          const rawSim = await Property.find({
+            _id: { $ne: id },
+            city: dbProperty.city,
+            moderationStatus: "approved",
+            availabilityStatus: "available",
+          })
+            .limit(3)
+            .lean();
+          dbSimilar = rawSim ? (rawSim as unknown as IProperty[]) : [];
+        }
+      } catch {
+        // Database offline, use sample portfolio
       }
-    } catch {
-      // Database offline, use sample portfolio
     }
 
     if (dbProperty) {
@@ -76,7 +79,7 @@ export async function GET(
     }
 
     // Lookup in Bahir Dar curated portfolio
-    const sample = BAHIR_DAR_SAMPLE_PROPERTIES.find((p) => p._id === id);
+    const sample = getSamplePropertyById(id) || BAHIR_DAR_SAMPLE_PROPERTIES.find((p) => p._id === id);
     if (sample) {
       const similar = BAHIR_DAR_SAMPLE_PROPERTIES.filter((p) => p._id !== id).slice(0, 3);
       return NextResponse.json({
