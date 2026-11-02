@@ -17,6 +17,28 @@ import { BAHIR_DAR_NEIGHBORHOODS, PROPERTY_TYPES, AMENITIES_LIST } from "@/lib/c
 import { BAHIR_DAR_SAMPLE_PROPERTIES } from "@/lib/sampleProperties";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
+const PROPERTY_TYPE_LABELS_AM: Record<string, string> = {
+  apartment: "ዘመናዊ አፓርታማ",
+  house: "ቪላ / መኖሪያ ቤት",
+  condo: "ኮንዶሚኒየም (G+)",
+  private_room: "የግል መኝታ ክፍል",
+  shared: "የጋራ መኖሪያ ቤት",
+  commercial: "ቢሮ / የንግድ ቦታ",
+};
+
+const AMENITY_LABELS_AM: Record<string, string> = {
+  backup_generator: "ተጠባባቂ ጄኔሬተር",
+  water_tank: "የውሃ ማጠራቀሚያ ታንከር",
+  wifi: "ፈጣን ዋይፋይ / ኢንተርኔት",
+  parking: "የመኪና ማቆሚያ (ፓርኪንግ)",
+  security: "የ24 ሰዓት ጥበቃ",
+  furnished: "የተሟላ የቤት እቃዎች",
+  modern_kitchen: "ዘመናዊ ኪችን",
+  balcony: "በረንዳ / ውብ እይታ",
+  elevator: "ሊፍት",
+  garden: "የግል ግቢ / አትክልት ስፍራ",
+};
+
 function PropertiesDirectoryContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -365,7 +387,7 @@ function PropertiesDirectoryContent() {
                 <option value="">{isAmharic ? "ሁሉም አይነቶች" : "All Categories"}</option>
                 {PROPERTY_TYPES.map((pt) => (
                   <option key={pt.id} value={pt.id}>
-                    {pt.label}
+                    {isAmharic ? (PROPERTY_TYPE_LABELS_AM[pt.id] || pt.label) : pt.label}
                   </option>
                 ))}
               </select>
@@ -433,7 +455,7 @@ function PropertiesDirectoryContent() {
                       onChange={() => toggleAmenity(amenity.id)}
                       className="rounded border-stone-300 text-[#C59B38] focus:ring-[#C59B38]"
                     />
-                    <span>{amenity.label}</span>
+                    <span>{isAmharic ? (AMENITY_LABELS_AM[amenity.id] || amenity.label) : amenity.label}</span>
                   </label>
                 ))}
               </div>

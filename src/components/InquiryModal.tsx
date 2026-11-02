@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { X, Calendar, Send, CheckCircle2 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface Props {
   propertyId: string;
@@ -18,8 +19,13 @@ export default function InquiryModal({
   onClose,
   onSuccess,
 }: Props) {
+  const { language } = useLanguage();
+  const isAmharic = language === "am";
+
   const [message, setMessage] = useState(
-    "Hello, I am interested in this rental property and would like to arrange an in-person viewing."
+    isAmharic
+      ? "ሰላም፣ ይህንን የኪራይ ቤት ለመጎብኘት ፍላጎት አለኝ፤ በአካል አይቼ ውይይት ለማድረግ ቀጠሮ መያዝ እፈልጋለሁ።"
+      : "Hello, I am interested in this rental property and would like to arrange an in-person viewing."
   );
   const [viewingDate, setViewingDate] = useState("");
   const [loading, setLoading] = useState(false);
@@ -79,16 +85,20 @@ export default function InquiryModal({
             <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-[#0A1426]">Inquiry Sent!</h3>
+            <h3 className="text-xl font-bold text-[#0A1426]">
+              {isAmharic ? "ጥያቄዎ በተሳካ ሁኔታ ተልኳል!" : "Inquiry Sent!"}
+            </h3>
             <p className="text-xs text-stone-500 max-w-sm mx-auto">
-              The landlord has received your viewing request and message. You can track this in your Tenant Dashboard.
+              {isAmharic
+                ? "አከራዩ የጉብኝት ጥያቄዎን እና መልእክትዎን ተቀብሏል። ሁኔታውን በተከራይ ዳሽቦርድዎ ውስጥ መከታተል ይችላሉ።"
+                : "The landlord has received your viewing request and message. You can track this in your Tenant Dashboard."}
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#C59B38] block mb-1">
-                RENTAL INQUIRY & VIEWING
+                {isAmharic ? "የኪራይ ጥያቄ እና የጉብኝት ቀጠሮ" : "RENTAL INQUIRY & VIEWING"}
               </span>
               <h3 className="text-lg font-bold text-[#0A1426] line-clamp-1">
                 {propertyTitle}
@@ -113,7 +123,7 @@ export default function InquiryModal({
 
             <div>
               <label htmlFor="inquiry-message" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5">
-                Message to Landlord
+                {isAmharic ? "ለአከራዩ የሚላክ መልእክት" : "Message to Landlord"}
               </label>
               <textarea
                 id="inquiry-message"
@@ -121,7 +131,11 @@ export default function InquiryModal({
                 required
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Introduce yourself and specify any questions regarding move-in date or utilities..."
+                placeholder={
+                  isAmharic
+                    ? "ራስዎን ያስተዋውቁ እና የመግቢያ ቀን ወይም ሌሎች ጥያቄዎች ካሉዎት እዚህ ይጻፉ..."
+                    : "Introduce yourself and specify any questions regarding move-in date or utilities..."
+                }
                 className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#C59B38]"
               />
             </div>
@@ -129,7 +143,11 @@ export default function InquiryModal({
             <div>
               <label htmlFor="viewing-date" className="block text-xs font-bold text-[#0A1426] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5 text-[#C59B38]" />
-                <span>Preferred In-Person Viewing Date (Optional)</span>
+                <span>
+                  {isAmharic
+                    ? "ቤቱን መጎብኘት የሚፈልጉበት ቀን (አስገዳጅ ያልሆነ)"
+                    : "Preferred In-Person Viewing Date (Optional)"}
+                </span>
               </label>
               <input
                 id="viewing-date"
@@ -148,7 +166,15 @@ export default function InquiryModal({
                 className="w-full btn-navy py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg disabled:opacity-60"
               >
                 <Send className="w-4 h-4 text-[#DFB967]" />
-                <span>{loading ? "Sending Request..." : "Submit Inquiry"}</span>
+                <span>
+                  {loading
+                    ? isAmharic
+                      ? "በመላክ ላይ..."
+                      : "Sending Request..."
+                    : isAmharic
+                    ? "የጉብኝት ጥያቄውን ላክ"
+                    : "Submit Inquiry"}
+                </span>
               </button>
             </div>
           </form>

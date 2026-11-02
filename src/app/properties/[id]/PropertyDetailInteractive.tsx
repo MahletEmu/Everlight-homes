@@ -38,15 +38,19 @@ export default function PropertyDetailInteractive({ property, landlord }: Props)
       <div className="bg-white p-6 sm:p-7 rounded-3xl border border-stone-200 shadow-xl space-y-5">
         <div>
           <span className="text-xs font-semibold text-stone-500 uppercase tracking-wider block">
-            Rental Rate
+            {isAmharic ? "የኪራይ ዋጋ" : "Rental Rate"}
           </span>
           <div className="text-3xl font-extrabold text-[#0A1426] mt-1">
             ETB {property.monthlyRent?.toLocaleString()}{" "}
-            <span className="text-sm font-normal text-stone-500">/month</span>
+            <span className="text-sm font-normal text-stone-500">
+              {isAmharic ? "/ ወር" : "/ month"}
+            </span>
           </div>
           {property.deposit > 0 && (
             <p className="text-xs text-stone-500 mt-1">
-              Refundable Security Deposit: ETB {property.deposit.toLocaleString()}
+              {isAmharic
+                ? `ተመላሽ የዋስትና ተቀማጭ: ${property.deposit.toLocaleString()} ብር`
+                : `Refundable Security Deposit: ETB ${property.deposit.toLocaleString()}`}
             </p>
           )}
         </div>
@@ -74,7 +78,7 @@ export default function PropertyDetailInteractive({ property, landlord }: Props)
                 className="w-full btn-navy py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition-all"
               >
                 <Calendar className="w-4 h-4 text-[#DFB967]" />
-                <span>Request In-Person Viewing</span>
+                <span>{isAmharic ? "በአካል ለማየት ቀጠሮ ይያዙ" : "Request In-Person Viewing"}</span>
               </button>
             </>
           ) : (
@@ -108,16 +112,18 @@ export default function PropertyDetailInteractive({ property, landlord }: Props)
             <div className="flex-1">
               <div className="flex items-center gap-1.5">
                 <span className="text-sm font-bold text-[#0A1426]">
-                  Bahir Dar Rental Broker (ደላላ)
+                  {isAmharic ? "የባህር ዳር የቤት ደላላ" : "Bahir Dar Rental Broker (ደላላ)"}
                 </span>
                 <ShieldCheck className="w-4 h-4 text-emerald-600" />
               </div>
               <span className="text-xs text-stone-500 block">
-                Direct Brokerage & Viewing Coordinator
+                {isAmharic
+                  ? "ቀጥተኛ የድለላ እና ጉብኝት አስተባባሪ"
+                  : "Direct Brokerage & Viewing Coordinator"}
               </span>
               {landlord?.name && (
                 <span className="text-[11px] text-stone-400 block mt-0.5">
-                  Property Owner: {landlord.name}
+                  {isAmharic ? `የቤቱ ባለቤት፦ ${landlord.name}` : `Property Owner: ${landlord.name}`}
                 </span>
               )}
             </div>
