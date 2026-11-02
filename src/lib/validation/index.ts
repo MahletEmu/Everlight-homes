@@ -21,7 +21,7 @@ export const LoginSchema = z.object({
 
 export const PropertySchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters").max(140),
-  description: z.string().min(20, "Description must be at least 20 characters"),
+  description: z.string().min(5, "Description must be at least 5 characters"),
   propertyType: z.enum([
     "apartment",
     "house",

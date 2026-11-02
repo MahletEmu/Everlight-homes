@@ -72,3 +72,14 @@ html {
   background-color: #132446;
   box-shadow: 0 4px 14px 0 rgba(10, 20, 38, 0.25);
 }
+
+/* Remove number input spin buttons */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}

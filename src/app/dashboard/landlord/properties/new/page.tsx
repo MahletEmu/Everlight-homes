@@ -187,7 +187,20 @@ function NewPropertyContent() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || (isAmharic ? "ቤቱን መመዝገብ አልተቻለም" : "Failed to create listing"));
+        let errorMsg = data.error || (isAmharic ? "ቤቱን መመዝገብ አልተቻለም" : "Failed to create listing");
+        if (data.details) {
+          const issues: string[] = [];
+          if (data.details.title) issues.push(isAmharic ? "የቤቱ ስም (ቢያንስ 5 ፊደላት)" : "Title (min 5 characters)");
+          if (data.details.description) issues.push(isAmharic ? "ስለ ቤቱ ዝርዝር ማብራሪያ (ቢያንስ 5 ፊደላት)" : "Description (min 5 characters)");
+          if (data.details.monthlyRent) issues.push(isAmharic ? "የወር ኪራይ (ቢያንስ 500 ብር)" : "Monthly Rent (min 500 ETB)");
+          if (data.details.images) issues.push(isAmharic ? "ቢያንስ አንድ ፎቶ" : "At least one photograph");
+          if (issues.length > 0) {
+            errorMsg = isAmharic
+              ? `እባክዎ የሚከተሉትን መረጃዎች በትክክል ያስገቡ፦ ${issues.join("፣ ")}`
+              : `Please check the following fields: ${issues.join(", ")}`;
+          }
+        }
+        throw new Error(errorMsg);
       }
 
       setSuccess(true);
@@ -393,9 +406,9 @@ function NewPropertyContent() {
                     value={monthlyRent}
                     onChange={(e) => setMonthlyRent(e.target.value === "" ? "" : Number(e.target.value))}
                     placeholder={isAmharic ? "ለምሳሌ፡ 12,000" : "e.g. 12,000"}
-                    className="w-full p-3 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#C59B38]"
+                    className="w-full p-3 pr-24 rounded-xl border border-stone-200 text-sm focus:outline-none focus:ring-1 focus:ring-[#C59B38] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
-                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-400">
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-bold text-stone-500 pointer-events-none select-none bg-stone-100 px-2 py-0.5 rounded-md border border-stone-200">
                     {isAmharic ? "ብር/ወር" : "ETB /mo"}
                   </span>
                 </div>
@@ -414,7 +427,7 @@ function NewPropertyContent() {
                     value={bedrooms}
                     onChange={(e) => setBedrooms(e.target.value === "" ? "" : Number(e.target.value))}
                     placeholder={isAmharic ? "ለምሳሌ፡ 2" : "e.g. 2"}
-                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
+                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
 
@@ -430,7 +443,7 @@ function NewPropertyContent() {
                     value={bathrooms}
                     onChange={(e) => setBathrooms(e.target.value === "" ? "" : Number(e.target.value))}
                     placeholder={isAmharic ? "ለምሳሌ፡ 1" : "e.g. 1"}
-                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
+                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
 
@@ -446,7 +459,7 @@ function NewPropertyContent() {
                     value={sizeM2}
                     onChange={(e) => setSizeM2(e.target.value === "" ? "" : Number(e.target.value))}
                     placeholder={isAmharic ? "ለምሳሌ፡ 85" : "e.g. 85"}
-                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none"
+                    className="w-full p-2.5 rounded-xl border border-stone-200 text-sm focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                 </div>
               </div>
